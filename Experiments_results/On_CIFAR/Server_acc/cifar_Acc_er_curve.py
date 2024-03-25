@@ -17,7 +17,7 @@ x=[1, 2, 3, 4, 5]
 labels = ['2%', '4%', '6%', '8%', '10%' ]
 unl_org = [65.80, 68.05, 67.23, 69.73, 67.88]
 
-unl_hess_r = [0.00, 43.55, 42.90, 43.38, 1.88]
+unl_hess_r = [40.00, 43.55, 42.90, 43.38, 1.88]
 unl_vbu = [40.40, 44.80, 47.13, 40.78, 39.58]
 
 unl_ss_w = [51.30, 47.80, 55.00, 55.55, 53.62]
@@ -25,17 +25,27 @@ unl_ss_w = [51.30, 47.80, 55.00, 55.55, 53.62]
 
 
 
+plt.style.use('seaborn')
 plt.figure()
+# plt.figure(figsize=(5.5, 5.3))
 l_w=5
 m_s=15
+marker_s = 3
+markevery=1
+
 #plt.figure(figsize=(8, 5.3))
 #plt.plot(x, unl_fr, color='blue', marker='^', label='Retrain',linewidth=l_w, markersize=m_s)
-plt.plot(x, unl_ss_w, color='g',  marker='*',  label='SCU',linewidth=l_w, markersize=m_s)
-#plt.plot(x, unl_ss_wo, color='palegreen',  marker='1',  label='MCFU$_{w/o}$',linewidth=l_w, markersize=m_s)
 
-plt.plot(x, unl_vbu, color='orange',  marker='x',  label='VBU',linewidth=l_w,  markersize=m_s)
+plt.plot(x, unl_ss_w, linestyle='-', color='#9BC985', marker='o', fillstyle='full', markevery=markevery,
+         label='SCU', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
 
-plt.plot(x, unl_hess_r, color='r',  marker='p',  label='HBU',linewidth=l_w, markersize=m_s)
+# plt.plot(x, unl_ss_wo, color='palegreen',  marker='1',  label='MCFU$_{w/o}$',linewidth=l_w, markersize=m_s)
+
+plt.plot(x, unl_vbu, linestyle='--', color='#797BB7', marker='s', fillstyle='full', markevery=markevery,
+         label='VBU', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+plt.plot(x, unl_hess_r, linestyle='-.', color='#E07B54', marker='D', fillstyle='full', markevery=markevery,
+         label='HBU', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
 
 
 #plt.plot(x, unl_vibu, color='silver',  marker='d',  label='VIBU',linewidth=4,  markersize=10)
@@ -49,14 +59,14 @@ plt.plot(x, unl_hess_r, color='r',  marker='p',  label='HBU',linewidth=l_w, mark
 # plt.grid()
 leg = plt.legend(fancybox=True, shadow=True)
 # plt.xlabel('Malicious Client Ratio (%)' ,fontsize=16)
-plt.ylabel('Accuracy (%)' ,fontsize=20)
+plt.ylabel('Accuracy (%)' ,fontsize=24)
 my_y_ticks = np.arange(0 ,71,10)
-plt.yticks(my_y_ticks,fontsize=20)
-plt.xlabel('$\it{EDR}$' ,fontsize=20)
+plt.yticks(my_y_ticks,fontsize=24)
+plt.xlabel('$\it{EDR}$' ,fontsize=24)
 
-plt.xticks(x, labels, fontsize=20)
+plt.xticks(x, labels, fontsize=24)
 # plt.title('CIFAR10 IID')
-plt.legend(loc='best',fontsize=20)
+plt.legend(loc='best',fontsize=24)
 plt.tight_layout()
 #plt.title("MNIST")
 plt.rcParams['figure.figsize'] = (2.0, 1)
@@ -65,5 +75,5 @@ plt.rcParams['figure.subplot.left'] = 0.11
 plt.rcParams['figure.subplot.bottom'] = 0.08
 plt.rcParams['figure.subplot.right'] = 0.977
 plt.rcParams['figure.subplot.top'] = 0.969
-plt.savefig('cifar_acc_er_curve.png', dpi=200)
+plt.savefig('cifar_acc_er_curve.pdf', format='pdf', dpi=200)
 plt.show()

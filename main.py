@@ -20,5 +20,6 @@ if __name__ == '__main__':
     x = [1,2,3,4,5,6,7]
     w_locals = [x[i] for i in range(2)]
     print(w_locals)
+    print(type(True))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

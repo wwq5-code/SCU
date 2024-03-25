@@ -1401,6 +1401,8 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
     vib_unl.load_state_dict(vib.state_dict())
     optimizer_unl = torch.optim.Adam(vib_unl.parameters(), lr=lr)
 
+    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+
     print(len(dataloader_erase.dataset))
     train_bs = 0
     clean_acc = []
@@ -1421,7 +1423,8 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
 
             logits_z_e, x_hat_e, mu_e, logvar_e = vib_unl(x, mode='VAE')
             logits_z_e2, x_hat_e2, mu_e2, logvar_e2 = vib_unl(x2, mode='VAE')
-
+            #use self-generated as postive for a already trained VAE
+            logits_z_e3, x_hat_e3, mu_e3, logvar_e3 = vib_unl(x_hat_e2.detach(), mode='VAE')
             logits_z_f, x_hat_f, mu_f, logvar_f = vib(x, mode='VAE')
 
             logits_y = classifier_model(x_hat_e.detach())
@@ -1442,6 +1445,16 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
 
             KL_z_r = (torch.exp(logits_z_e_log_softmax) * logits_z_e_log_softmax).sum(dim=1).mean() + math.log(
                 logits_z_e_log_softmax.shape[1])
+
+            # KLD between erased z_e and the remaining z_r, the less similar the better
+            KLD_mean_e_r = 0.5 * torch.mean(
+                logvar_e2 - logvar_e + (torch.exp(logvar_e) + (mu_e - mu_e2).pow(2)) / torch.exp(logvar_e2) - 1).cuda()
+
+            # or calculate similarity directly based on z_e and z_r
+
+
+            similarity_of_ze_zr = (1 - cos(logits_z_e, logits_z_e2)).sum() #1.0 -
+            similarity_positive = (1 - cos(logits_z_e2, logits_z_e3)).sum()
 
 
             # x_hat_e = x_hat_e.view(x_hat_e.size(0), -1)
@@ -1466,7 +1479,7 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
             # Calculate the L2-norm
             l2_norm_unl = torch.norm(args.kld_to_org * KLD_mean  - args.unlearn_bce * BCE , p=2)
 
-            l2_norm_ss = torch.norm(args.self_sharing_rate * (args.beta * KLD_mean2  + BCE2 ), p=2)
+            l2_norm_ss = torch.norm(args.self_sharing_rate * (args.beta * KLD_mean2 + similarity_positive / similarity_of_ze_zr + BCE2 ), p=2)
 
             total_u_s = l2_norm_unl + l2_norm_ss
             unl_rate = l2_norm_unl / total_u_s
@@ -1493,7 +1506,7 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
                 loss = args.kld_to_org * KLD_mean - args.unlearn_bce * BCE
             elif train_type == 'VAE_unl_ss':
                 loss = (args.kld_to_org * KLD_mean - args.unlearn_bce * BCE) * unl_rate + self_s_rate * args.self_sharing_rate * (
-                               args.beta * KLD_mean2 + BCE2)  # args.beta * KLD_mean - H_p_q + args.beta * KLD_mean2  + H_p_q2 #- log_z / e_log_py #-   # H_p_q + args.beta * KLD_mean2
+                               args.beta * KLD_mean2 + similarity_positive / similarity_of_ze_zr + BCE2)  # args.beta * KLD_mean - H_p_q + args.beta * KLD_mean2  + H_p_q2 #- log_z / e_log_py #-   # H_p_q + args.beta * KLD_mean2
             elif train_type == 'VBU':
                 loss = args.beta * KLD_mean*0.0 + args.unl_r_for_bayesian * (- BCE)
 
@@ -1510,6 +1523,8 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
                 'BCE': BCE.item(),
                 'l2_norm_unl': l2_norm_unl,
                 'l2_norm_ss': l2_norm_ss,
+                'similarity_positive': similarity_positive,
+                'similarity_of_ze_zr':similarity_of_ze_zr,
                 # 'H(p,q)': H_p_q.item(),
                 # 'kl_f_e': kl_f_e.item(),
                 # 'H_p_q2': H_p_q2.item(),

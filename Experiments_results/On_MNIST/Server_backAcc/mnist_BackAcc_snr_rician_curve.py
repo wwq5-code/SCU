@@ -34,7 +34,7 @@ plt.plot(x, unl_ss_w, color='g',  marker='*',  label='SCU',linewidth=l_w, marker
 
 plt.plot(x, unl_vbu, color='orange',  marker='x',  label='VBU',linewidth=l_w,  markersize=m_s)
 
-plt.plot(x, unl_hess_r, color='r',  marker='p',  label='HBU',linewidth=l_w, markersize=m_s)
+plt.plot(x, unl_hess_r, color='deepskyblue',  marker='p',  label='HBU',linewidth=l_w, markersize=m_s)
 
 
 # plt.plot(x, y_sa03, color='r',  marker='2',  label='AAAI21 A_acc, pr=0.3',linewidth=3, markersize=8)

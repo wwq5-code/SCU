@@ -33,7 +33,7 @@ plt.plot(x, unl_ss_w, color='g',  marker='*',  label='SCU',linewidth=l_w, marker
 
 plt.plot(x, unl_vbu, color='orange',  marker='x',  label='VBU',linewidth=l_w,  markersize=m_s)
 
-plt.plot(x, unl_hess_r, color='r',  marker='p',  label='HBU',linewidth=l_w, markersize=m_s)
+plt.plot(x, unl_hess_r, color='deepskyblue',  marker='p',  label='HBU',linewidth=l_w, markersize=m_s)
 
 
 #plt.plot(x, unl_vibu, color='silver',  marker='d',  label='VIBU',linewidth=4,  markersize=10)

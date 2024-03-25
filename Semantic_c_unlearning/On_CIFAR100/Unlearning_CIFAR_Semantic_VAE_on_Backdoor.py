@@ -1748,6 +1748,7 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
     vib_unl.to(args.device)
     vib_unl.load_state_dict(vib.state_dict())
     optimizer_unl = torch.optim.Adam(vib_unl.parameters(), lr=lr)
+    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
 
     print(len(dataloader_erase.dataset))
     train_bs = 0
@@ -1760,6 +1761,8 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
         vib_unl.train()
         batch_idx = 0
         for (x, y), (x2, y2) in zip(dataloader_erase, dataloader_remain):
+            if x.size(0) != x2.size(0):
+                continue
             x, y = x.to(args.device), y.to(args.device)  # (B, C, H, W), (B, 10)
             if args.dataset == 'MNIST':
                 x = x.view(x.size(0), -1)
@@ -1771,6 +1774,10 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
             logits_y_e, logits_z_e, x_hat_e, mu_e, logvar_e = vib_unl(x, mode='VAE_CIFAR')
             logits_y_e2, logits_z_e2, x_hat_e2, mu_e2, logvar_e2 = vib_unl(x2, mode='VAE_CIFAR')
 
+            #use self-generated as postive for a already trained VAE
+            x_hat_e2_input = x_hat_e2.detach().view(x_hat_e2.detach().size(0), 3, 32, 32)
+            #             print("shape",x_hat_e2_input.shape)
+            logits_y_e3, logits_z_e3, x_hat_e3, mu_e3, logvar_e3 = vib_unl(x_hat_e2_input, mode='VAE_CIFAR')
             logits_y_f, logits_z_f, x_hat_f, mu_f, logvar_f = vib(x, mode='VAE_CIFAR')
 
             x_hat_e = x_hat_e.view(x_hat_e.size(0), 3, 32, 32)
@@ -1793,6 +1800,11 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
             KL_z_r = (torch.exp(logits_z_e_log_softmax) * logits_z_e_log_softmax).sum(dim=1).mean() + math.log(
                 logits_z_e_log_softmax.shape[1])
 
+            # or calculate similarity directly based on z_e and z_r
+
+
+            similarity_of_ze_zr = (1 - cos(logits_z_e, logits_z_e2)).sum() #1.0 -
+            similarity_positive = (1 - cos(logits_z_e2, logits_z_e3)).sum()
 
             # x_hat_e = x_hat_e.view(x_hat_e.size(0), -1)
             # x_hat_e = torch.sigmoid(reconstructor(logits_z_e))
@@ -1821,7 +1833,7 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
 
             l2_norm_unl = torch.norm(args.kld_to_org * KLD_mean  - args.unlearn_bce * BCE - args.unlearn_bce * H_p_q/30 , p=2)
 
-            l2_norm_ss = torch.norm(args.self_sharing_rate * (args.beta * KLD_mean2  + BCE2 + H_p_q2/30), p=2)
+            l2_norm_ss = torch.norm(args.self_sharing_rate * (args.beta * KLD_mean2 + similarity_positive / similarity_of_ze_zr + BCE2 + H_p_q2/30), p=2)
 
 
             total_u_s = l2_norm_unl + l2_norm_ss
@@ -1849,7 +1861,7 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
                 loss = args.kld_to_org * KLD_mean - args.unlearn_bce * BCE - args.unlearn_bce * H_p_q/30
             elif train_type == 'VAE_unl_ss':
                 loss = (args.kld_to_org * KLD_mean - args.unlearn_bce * BCE - args.unlearn_bce * H_p_q/30 ) * unl_rate + self_s_rate * args.self_sharing_rate * (
-                               args.beta * KLD_mean2 + BCE2*30 + H_p_q2/30)  # args.beta * KLD_mean - H_p_q + args.beta * KLD_mean2  + H_p_q2 #- log_z / e_log_py #-   # H_p_q + args.beta * KLD_mean2
+                               args.beta * KLD_mean2 + similarity_positive / similarity_of_ze_zr + BCE2*30 + H_p_q2/30)  # args.beta * KLD_mean - H_p_q + args.beta * KLD_mean2  + H_p_q2 #- log_z / e_log_py #-   # H_p_q + args.beta * KLD_mean2
             elif train_type == 'VBU':
                 loss = args.beta * KLD_mean*0.0 + args.unl_r_for_bayesian * (- BCE) + args.unl_r_for_bayesian * (- H_p_q)/30
 
@@ -1866,6 +1878,8 @@ def unlearning_vae(vib, args, dataloader_erase, dataloader_remain, reconstructio
                 'BCE': BCE.item(),
                 'l2_norm_unl': l2_norm_unl,
                 'l2_norm_ss': l2_norm_ss,
+                'similarity_positive': similarity_positive,
+                'similarity_of_ze_zr': similarity_of_ze_zr,
                 # 'H(p,q)': H_p_q.item(),
                 # 'kl_f_e': kl_f_e.item(),
                 # 'H_p_q2': H_p_q2.item(),

@@ -26,18 +26,34 @@ unl_ss_erased = [36.7558, 39.3063, 35.4111, 41.5716, 33.0236]
 #unl_ss_wo = [23.54, 19.375, 31.33, 33.92, 37.80]
 
 
-
+plt.style.use('seaborn')
 plt.figure()
 l_w=5
 m_s=15
+
+marker_s = 3
+markevery=1
+
 #plt.figure(figsize=(8, 5.3))
 #plt.plot(x, unl_fr, color='blue', marker='^', label='Retrain',linewidth=l_w, markersize=m_s)
-plt.plot(x, unl_ss_clean, color='palegreen',  marker='*',  label='SCU (Clean)',linewidth=l_w, markersize=m_s)
-plt.plot(x, unl_ss_erased, color='g',  marker='1',  label='SCU (Erased)',linewidth=l_w, markersize=m_s)
 
-plt.plot(x, unl_vbu, color='orange',  marker='x',  label='VBU',linewidth=l_w,  markersize=m_s)
+plt.plot(x, unl_ss_clean, linestyle='-', color='#9BC985', marker='o', fillstyle='full', markevery=markevery,
+         label='SCU (Clean)', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
 
-plt.plot(x, unl_hess_r, color='r',  marker='p',  label='HBU',linewidth=l_w, markersize=m_s)
+plt.plot(x, unl_ss_erased, linestyle=':', color='#2A5522',  marker='^', fillstyle='full', markevery=markevery,
+         label='SCU (Erased)', linewidth=l_w,  markersize=m_s, markeredgewidth=marker_s)
+
+
+
+#plt.plot(x, unl_ss_wo, color='palegreen',  marker='1',  label='MCFU$_{w/o}$',linewidth=l_w, markersize=m_s)
+
+plt.plot(x, unl_vbu, linestyle='--', color='#797BB7',  marker='s', fillstyle='full', markevery=markevery,
+         label='VBU',linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+
+
+plt.plot(x, unl_hess_r, linestyle='-.', color='#E07B54',  marker='D', fillstyle='full', markevery=markevery,
+         label='HBU',linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
 
 
 #plt.plot(x, unl_vibu, color='silver',  marker='d',  label='VIBU',linewidth=4,  markersize=10)
@@ -51,15 +67,15 @@ plt.plot(x, unl_hess_r, color='r',  marker='p',  label='HBU',linewidth=l_w, mark
 # plt.grid()
 leg = plt.legend(fancybox=True, shadow=True)
 # plt.xlabel('Malicious Client Ratio (%)' ,fontsize=16)
-plt.ylabel('MSE' ,fontsize=20)
+plt.ylabel('MSE' ,fontsize=24)
 my_y_ticks = np.arange(0 ,201,40)
-plt.yticks(my_y_ticks,fontsize=20)
+plt.yticks(my_y_ticks,fontsize=24)
 plt.ylim(0,200)
-plt.xlabel('$\it{EDR}$' ,fontsize=20)
+plt.xlabel('$\it{EDR}$' ,fontsize=24)
 
-plt.xticks(x, labels, fontsize=20)
+plt.xticks(x, labels, fontsize=24)
 # plt.title('CIFAR10 IID')
-plt.legend(loc='best',fontsize=20)
+plt.legend(loc='best',fontsize=24)
 plt.tight_layout()
 #plt.title("MNIST")
 plt.rcParams['figure.figsize'] = (2.0, 1)
@@ -68,5 +84,5 @@ plt.rcParams['figure.subplot.left'] = 0.11
 plt.rcParams['figure.subplot.bottom'] = 0.08
 plt.rcParams['figure.subplot.right'] = 0.977
 plt.rcParams['figure.subplot.top'] = 0.969
-plt.savefig('cifar100_mse_erased_er_curve.png', dpi=200)
+plt.savefig('cifar100_mse_erased_er_curve.pdf', format='pdf', dpi=200)
 plt.show()

@@ -50,7 +50,7 @@ for i in range(125):
     y_vbu_clean_mse_list.append(y_vbu_clean_mse[i*t_i]/100)
 
 
-
+plt.style.use('seaborn')
 fig, ax = plt.subplots(figsize=(7, 5))
 
 
@@ -114,9 +114,9 @@ plt.ylim(0, 1500)
 my_x_ticks = np.arange(0, 501, 100)
 plt.xticks(my_x_ticks,fontsize=20)
 # plt.title('CIFAR10 IID')
-# plt.legend(loc='best',fontsize=16)
-plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-           ncol=4, mode="expand", borderaxespad=0., fontsize=15)
+plt.legend(loc='best',fontsize=16)
+# plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+#            ncol=4, mode="expand", borderaxespad=0., fontsize=15)
 
 plt.tight_layout()
 #plt.title("Fashion MNIST")
@@ -126,5 +126,5 @@ plt.rcParams['figure.subplot.left'] = 0.11
 plt.rcParams['figure.subplot.bottom'] = 0.08
 plt.rcParams['figure.subplot.right'] = 0.977
 plt.rcParams['figure.subplot.top'] = 0.969
-plt.savefig('cifar100_epoch_mse_temp.png', dpi=200)
+plt.savefig('cifar100_epoch_mse_temp.pdf', format='pdf', dpi=200)
 plt.show()

@@ -27,25 +27,49 @@ unl_ss_w_back = [8.97, 8.81, 7.53, 9.47, 10.06]
 #unl_ss_wo = [94.71, 93.83, 94.78, 94.07, 93.87]
 
 
-
+plt.style.use('seaborn')
 plt.figure()
+
 l_w=5
 m_s=15
+marker_s = 3
+markevery=1
+
 #plt.figure(figsize=(8, 5.3))
 #plt.plot(x, unl_fr, color='blue', marker='^', label='Retrain',linewidth=l_w, markersize=m_s)
-plt.plot(x, unl_ss_w, color='g',  marker='*',  label='SCU',linewidth=l_w, markersize=m_s)
-#plt.plot(x, unl_ss_wo, color='palegreen',  marker='1',  label='MCFU$_{w/o}$',linewidth=l_w, markersize=m_s)
 
-plt.plot(x, unl_vbu, color='orange',  marker='x',  label='VBU',linewidth=l_w,  markersize=m_s)
 
-plt.plot(x, unl_hess_r, color='r',  marker='p',  label='HBU',linewidth=l_w, markersize=m_s)
 
-plt.plot(x, unl_ss_w_back, color='g',  marker='*', linestyle=(0, (1, 2, 4)), label='SCU (bac.)',linewidth=l_w, markersize=m_s)
-#plt.plot(x, unl_ss_wo, color='palegreen',  marker='1',  label='MCFU$_{w/o}$',linewidth=l_w, markersize=m_s)
 
-plt.plot(x, unl_vbu_back, color='orange',  marker='x', linestyle=(0, (1, 2, 4)),  label='VBU (bac.)',linewidth=l_w,  markersize=m_s)
 
-plt.plot(x, unl_hess_r_back, color='r',  marker='p', linestyle=(0, (1, 2, 4)), label='HBU (bac.)',linewidth=l_w, markersize=m_s)
+
+plt.plot(x, unl_ss_w, linestyle='-', color='#9BC985', marker='o', fillstyle='full', markevery=markevery,
+         label='SCU', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+
+
+plt.plot(x, unl_vbu, linestyle='-', color='#797BB7', marker='s', fillstyle='full', markevery=markevery,
+         label='VBU', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+
+plt.plot(x, unl_hess_r, linestyle='-', color='#E07B54', marker='D', fillstyle='full', markevery=markevery,
+         label='HBU', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+
+
+plt.plot(x, unl_ss_w_back, linestyle=(0, (1, 2, 4)), color='#9BC985', marker='o', fillstyle='full', markevery=markevery,
+         label='SCU (bac.)', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+
+
+plt.plot(x, unl_vbu_back, linestyle=(0, (1, 2, 4)), color='#797BB7', marker='s', fillstyle='full', markevery=markevery,
+         label='VBU (bac.)', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+
+plt.plot(x, unl_hess_r_back, linestyle=(0, (1, 2, 4)), color='#E07B54', marker='D', fillstyle='full', markevery=markevery,
+         label='HBU (bac.)', linewidth=l_w, markersize=m_s, markeredgewidth=marker_s)
+
+
 
 
 #plt.plot(x, unl_vibu, color='silver',  marker='d',  label='VIBU',linewidth=4,  markersize=10)
@@ -57,12 +81,12 @@ plt.plot(x, unl_hess_r_back, color='r',  marker='p', linestyle=(0, (1, 2, 4)), l
 
 
 # plt.grid()
-leg = plt.legend(fancybox=True, shadow=True)
+# leg = plt.legend(fancybox=True, shadow=True)
 # plt.xlabel('Malicious Client Ratio (%)' ,fontsize=16)
-plt.ylabel('Acc. and backdoor acc. (%)', fontsize=20)
+plt.ylabel('Acc. and backdoor acc. (%)', fontsize=24)
 my_y_ticks = np.arange(0, 101, 20)
 plt.yticks(my_y_ticks, fontsize=20)
-plt.xlabel('$\it{SNR}$', fontsize=20)
+plt.xlabel('$\it{SNR}$', fontsize=24)
 
 plt.xticks(x, labels, fontsize=20)
 # plt.title('CIFAR10 IID')
@@ -75,5 +99,5 @@ plt.rcParams['figure.subplot.left'] = 0.11
 plt.rcParams['figure.subplot.bottom'] = 0.08
 plt.rcParams['figure.subplot.right'] = 0.977
 plt.rcParams['figure.subplot.top'] = 0.969
-plt.savefig('mnist_acc_snr_awgn_curve.png', dpi=200)
+plt.savefig('mnist_acc_snr_awgn_curve.pdf', format='pdf', dpi=200)
 plt.show()
